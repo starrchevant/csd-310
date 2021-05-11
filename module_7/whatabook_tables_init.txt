@@ -1,0 +1,107 @@
+/*
+    Title: whatabook_tables.sql
+    Author: Chevant Starr
+    Date: 11 May 2021
+    Description: Whatabook database initialization script.
+*/
+
+-- drop test user if exists 
+DROP USER IF EXISTS 'whatabook_user'@'localhost';
+
+
+-- create whatabook_user and grant them all privileges to the whatabook database 
+CREATE USER 'whatabook_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'MySQL8IsGreat!';
+
+-- grant all privileges to the pysports database to user whatabook_user on localhost 
+GRANT ALL PRIVILEGES ON whatabook.* TO'whatabook_user'@'localhost';
+
+
+-- drop tables if they are present
+DROP TABLE IF EXISTS wishlist;
+DROP TABLE IF EXISTS user;
+DROP TABLE IF EXISTS book;
+DROP TABLE IF EXISTS store;
+
+
+-- create the user table 
+CREATE TABLE user (
+    user_id     INT             NOT NULL        AUTO_INCREMENT,
+    first_name   VARCHAR(75)     NOT NULL,
+    last_name      VARCHAR(75)     NOT NULL,
+    PRIMARY KEY(user_id)
+); 
+
+CREATE TABLE book (
+    book_id     INT             NOT NULL        AUTO_INCREMENT,
+    book_name   VARCHAR(200)     NOT NULL,
+    details      VARCHAR(500),
+    author VARCHAR(200) NOT NULL,
+    PRIMARY KEY(book_id)
+); 
+
+CREATE TABLE store (
+    store_id     INT             NOT NULL,
+    locale   VARCHAR(500)     NOT NULL,
+    PRIMARY KEY(store_id)
+);
+
+-- create the wishlist table and set the foreign key
+CREATE TABLE wishlist (
+    wishlist_id   INT             NOT NULL        AUTO_INCREMENT,
+    user_id   INT             NOT NULL,
+    book_id   INT             NOT NULL,
+    PRIMARY KEY(wishlist_id),
+    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES user(user_id),
+    CONSTRAINT fk_book FOREIGN KEY(book_id) REFERENCES book(book_id)
+);
+
+INSERT INTO store(store_id, locale)
+    VALUES('1213', 'yellow tigers');
+
+INSERT INTO book(book_name, author)
+    VALUES('Moby Dick', 'Chevy Starr');
+
+INSERT INTO book(book_name, author)
+    VALUES('Game of Thornes', 'G. R.R, Martin');
+
+INSERT INTO book(book_name, author)
+    VALUES('Lords of the Rings', 'J.R.R. Tolkien');
+
+INSERT INTO book(book_name, author)
+    VALUES('The two towers', 'J.R.R. Tolkien');
+
+INSERT INTO book(book_name, author)
+    VALUES('Return of the KING', 'J.R.R. Tolkien');
+
+INSERT INTO book(book_name, author)
+    VALUES('Winds of Winter', 'G. R.R, Martin');
+
+INSERT INTO book(book_name, author)
+    VALUES('Song of Fire and ICE', 'G. R.R, Martin');
+
+INSERT INTO book(book_name, author)
+    VALUES('The Phantom Toolbooth', 'MR. Booth');
+
+INSERT INTO book(book_name, author, details)
+    VALUES('Harry Potter', 'J.K. Rawlings', 'About Wizards');
+
+INSERT INTO user(first_name, last_name)
+    VALUES('Chevy', 'Starr');
+
+INSERT INTO user(first_name, last_name)
+    VALUES('J.R.R', 'Tolkien');
+
+INSERT INTO user(first_name, last_name)
+    VALUES('G.R.R', 'Martin');
+
+INSERT INTO wishlist(user_id, book_id) 
+    VALUES((SELECT user_id FROM user WHERE first_name = "Chevy"),(SELECT book_id FROM book WHERE book_name = 'Moby Dick'));
+
+INSERT INTO wishlist(user_id, book_id)
+    VALUES((SELECT user_id FROM user WHERE first_name = "J.R.R"),(SELECT book_id FROM book WHERE book_name = 'Lords of the Rings')); 
+   
+INSERT INTO wishlist(user_id, book_id) 
+     VALUES((SELECT user_id FROM user WHERE first_name = "G.R.R"),(SELECT book_id FROM book WHERE book_name = 'Game of Thornes'));    
+
+
+

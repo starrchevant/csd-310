@@ -31,33 +31,60 @@ def show_locations(cursor):
     print("-- DISPLAYING LOCATION RECORDS --")
     for location in locations:       
         print("Locale: {}".format(location[1]))
-def validate_user():
-    pass
+
+def validate_user(cursor, user_id):
+    cursor.execute("SELECT * FROM user WHERE user_id = " + user_id.strip())
+    userlist = cursor.fetchall()
+    return len(userlist) == 1
+
 def run_my_account():
     user_id=input("Please enter your user_id:")
-    if validate_user(user_id):
+    if validate_user(cursor, user_id):
+        user_choice = 5
         while user_choice !="3":
-            show_account_menu()
+            show_account_menu()            
             user_choice=input("Please enter your choice:")
             if user_choice == "1":
                 show_wishlist(cursor, user_id)                       
             if user_choice == "2":
                         show_books_to_add(cursor, user_id)
+                        book_id=input("Please enter the Book ID:")
+                        add_book_to_wishlist(cursor, user_id, book_id)
+
             if user_choice not in ("1","2","3"):
                         print("Please enter '1,'2,'3")
             if user_choice == "3":
                         print("Going back to Main Menu.")
+    else:
+        print("User Id is invalid.")
 
 def show_account_menu():
-    pass
-def show_wishlist(cursor, _user_id):
-    pass
-def show_books_to_add(cursor, _user_id):
-    pass
-def add_book_to_wishlist(cursor, _user_id, _book_id):
-    pass
-def account_menu():
-    pass
+    print("Here is the Account Menu:")
+    print("Enter 1 for Wishlist")
+    print("Enter 2 to add a Book")
+    print("Enter 3 to return to Main Menu")
+
+def show_wishlist(cursor, user_id):
+    cursor.execute("SELECT * FROM wishlist INNER JOIN book on wishlist.book_id = book.book_id WHERE user_id = " + user_id.strip())
+    wishlist = cursor.fetchall()
+    for row in wishlist:
+        print("")
+        print(row[4])
+
+
+def show_books_to_add(cursor, user_id):
+    cursor.execute("SELECT * FROM book")
+    books = cursor.fetchall()
+    print("-- DISPLAYING WISHLIST RECORDS --")
+    for book in books:
+        print("Book Name: {}".format(book[1]))
+        print("Author Name: {}".format(book[3]))
+        print("Book ID: {}".format(book[0]))
+
+def add_book_to_wishlist(cursor, user_id, book_id):
+    cursor.execute(f"INSERT INTO wishlist (user_id,book_id) VALUES ({user_id},{book_id})")
+
+
 
 try:
     db = mysql.connector.connect(**config)
